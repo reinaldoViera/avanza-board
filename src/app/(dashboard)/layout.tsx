@@ -1,0 +1,23 @@
+'use client'
+
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { useAuth } from '@/features/auth/AuthProvider'
+import { DashboardLayout } from '@/components/layout/DashboardLayout'
+
+export default function Layout({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useAuth()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/')
+    }
+  }, [user, loading, router])
+
+  if (loading || !user) {
+    return null
+  }
+
+  return <DashboardLayout>{children}</DashboardLayout>
+}
