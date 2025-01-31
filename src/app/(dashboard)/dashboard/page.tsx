@@ -4,14 +4,8 @@ import { useEffect, useState } from 'react'
 import { collection, query, where, getDocs } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 import { useAuth } from '@/features/auth/AuthProvider'
+import { Task } from '@/features/types'
 
-interface Task {
-  id: string
-  title: string
-  status: string
-  priority: string
-  dueDate: string
-}
 
 export default function DashboardPage() {
   const { user } = useAuth()
@@ -76,7 +70,7 @@ export default function DashboardPage() {
         <div className="card">
           <div className="text-sm font-medium text-gray-500">Completed</div>
           <div className="mt-1 text-3xl font-semibold">
-            {tasks.filter(task => task.status === 'completed').length}
+            {tasks.filter(task => task.status === 'done').length}
           </div>
         </div>
         <div className="card">
@@ -115,7 +109,7 @@ export default function DashboardPage() {
                   </td>
                   <td className="whitespace-nowrap px-6 py-4">
                     <span className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
-                      task.status === 'completed'
+                      task.status === 'done'
                         ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
                         : task.status === 'in-progress'
                         ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
