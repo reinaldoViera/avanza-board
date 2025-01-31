@@ -1,6 +1,6 @@
 import { initializeApp, getApps } from 'firebase/app';
 import { connectAuthEmulator, getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import { connectFirestoreEmulator, getFirestore } from 'firebase/firestore';
 import { getFunctions } from 'firebase/functions';
 
 const firebaseConfig = {
@@ -22,6 +22,10 @@ if (process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_EMULATOR_H
   });
 }
 const db = getFirestore(app);
+if (process.env.NODE_ENV === 'development') {
+  connectFirestoreEmulator(db, '127.0.0.1', 8080);
+}
+
 const functions = getFunctions(app);
 
 export { app, auth, db, functions };
