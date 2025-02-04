@@ -118,7 +118,7 @@ export function KanbanBoard({ project }: KanbanBoardProps) {
                             <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                               {task.description}
                             </p>
-                            <div className="mt-2 flex items-center gap-2">
+                            <div className="mt-2 flex flex-wrap items-center gap-2">
                               <span
                                 className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
                                   task.priority === 'high'
