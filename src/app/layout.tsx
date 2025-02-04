@@ -8,6 +8,9 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: 'AvanzaBoard - AI-Powered Task Management',
   description: 'Modern task management platform with AI-powered insights and real-time collaboration',
+  icons: {
+    icon: '/logo.svg',
+  }
 }
 
 export default function RootLayout({

@@ -1,8 +1,10 @@
+
+
 export interface Task {
   id: string
   title: string
   description: string
-  status: 'backlog' | 'todo' | 'in-progress' | 'review' | 'done'
+  status: 'todo' | 'in_progress' | 'done'
   priority: 'low' | 'medium' | 'high'
   assignedTo: string
   createdBy: string
