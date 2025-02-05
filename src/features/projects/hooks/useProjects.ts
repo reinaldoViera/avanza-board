@@ -60,7 +60,7 @@ export function useProjects(teamId?: string) {
         createdBy: user.uid,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-        tasks: [],
+        taskIds: [],
       }
 
       const docRef = await addDoc(collection(db, 'projects'), project)
@@ -81,60 +81,9 @@ export function useProjects(teamId?: string) {
     await deleteDoc(doc(db, 'projects', projectId))
   }, [])
 
-  const addTask = useCallback(
-    async (
-      projectId: string,
-      task: Omit<Task, 'id' | 'createdAt' | 'updatedAt' | 'createdBy'>
-    ) => {
-      if (!user) return
+  
 
-      const newTask: Task = {
-        ...task,
-        id: nanoid(10),
-        createdBy: user.uid,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      }
-
-      const project = projects.find((p) => p.id === projectId)
-      if (!project) return
-
-      const updatedTasks = [...project.tasks, newTask]
-      await updateProject(projectId, { tasks: updatedTasks })
-    },
-    [projects, updateProject, user]
-  )
-
-  const updateTask = useCallback(
-    async (projectId: string, taskId: string, data: Partial<Task>) => {
-      const project = projects.find((p) => p.id === projectId)
-      if (!project) return
-
-      const taskIndex = project.tasks.findIndex((t) => t.id === taskId)
-      if (taskIndex === -1) return
-
-      const updatedTasks = [...project.tasks]
-      updatedTasks[taskIndex] = {
-        ...updatedTasks[taskIndex],
-        ...data,
-        updatedAt: new Date().toISOString(),
-      }
-
-      await updateProject(projectId, { tasks: updatedTasks })
-    },
-    [projects, updateProject]
-  )
-
-  const deleteTask = useCallback(
-    async (projectId: string, taskId: string) => {
-      const project = projects.find((p) => p.id === projectId)
-      if (!project) return
-
-      const updatedTasks = project.tasks.filter((t) => t.id !== taskId)
-      await updateProject(projectId, { tasks: updatedTasks })
-    },
-    [projects, updateProject]
-  )
+  
 
   return {
     projects,
@@ -142,8 +91,5 @@ export function useProjects(teamId?: string) {
     createProject,
     updateProject,
     deleteProject,
-    addTask,
-    updateTask,
-    deleteTask,
   }
 }

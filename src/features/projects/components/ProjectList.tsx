@@ -45,7 +45,7 @@ export function ProjectList({ teamId }: ProjectListProps) {
 
             <div className="mt-4">
               <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
-                <span>{project.tasks.length} tasks</span>
+                <span>{project.taskIds.length} tasks</span>
                 <span>
                   Created {new Date(project.createdAt).toLocaleDateString()}
                 </span>

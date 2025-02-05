@@ -9,6 +9,8 @@ import {
 } from '@hello-pangea/dnd'
 import { Project, TaskStatus } from '../types'
 import { useProjects } from '../hooks/useProjects'
+import { useTasks } from '@/features/tasks/hooks/useTasks'
+import { useTaskActions } from '@/features/tasks/hooks/useTaskActions'
 import { PlusIcon, PencilIcon } from '@heroicons/react/24/outline'
 import { CreateTaskModal } from './CreateTaskModal'
 import { EditTaskModal } from './EditTaskModal'
@@ -25,12 +27,14 @@ const columns: { id: TaskStatus; title: string }[] = [
 ]
 
 export function KanbanBoard({ project }: KanbanBoardProps) {
-  const { updateTask } = useProjects()
+  const { updateTask } = useTaskActions()
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [selectedTask, setSelectedTask] = useState<Task | null>(null)
 
-  const tasks = project.tasks.reduce<Record<TaskStatus, Task[]>>(
+  const { tasks: projectTasks, loading } = useTasks(project.id)
+
+  const tasks = projectTasks.reduce<Record<TaskStatus, Task[]>>(
     (acc, task) => {
       if (!acc[task.status]) {
         acc[task.status] = []
@@ -41,7 +45,7 @@ export function KanbanBoard({ project }: KanbanBoardProps) {
     { todo: [], in_progress: [], done: [] }
   )
 
-  const onDragEnd = (result: DropResult) => {
+  const onDragEnd = async (result: DropResult) => {
     const { destination, source, draggableId } = result
 
     if (!destination) return
@@ -53,12 +57,16 @@ export function KanbanBoard({ project }: KanbanBoardProps) {
       return
     }
 
-    const task = project.tasks.find((t) => t.id === draggableId)
+    const task = projectTasks.find((t) => t.id === draggableId)
     if (!task) return
 
-    updateTask(project.id, task.id, {
-      status: destination.droppableId as TaskStatus,
-    })
+    try {
+      await updateTask(task.id, {
+        status: destination.droppableId as TaskStatus,
+      })
+    } catch (error) {
+      console.error('Error updating task status:', error)
+    }
   }
 
   return (

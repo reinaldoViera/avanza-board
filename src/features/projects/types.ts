@@ -2,8 +2,6 @@ import { Task } from '../types'
 
 export type TaskStatus = 'todo' | 'in_progress' | 'done'
 
-
-
 export interface Project {
   id: string
   name: string
@@ -12,5 +10,5 @@ export interface Project {
   createdBy: string
   createdAt: string
   updatedAt: string
-  tasks: Task[]
+  taskIds: string[]
 }

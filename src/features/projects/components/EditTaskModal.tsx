@@ -9,26 +9,26 @@ import {
   TransitionChild,
 } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
-import { useProjects } from '../hooks/useProjects'
 import { useTeams } from '@/features/teams/hooks/useTeams'
 import { Task } from '@/features/types'
 import { Project } from '../types'
 import { useAuth } from '@/features/auth/AuthProvider'
+import { useTaskActions } from '@/features/tasks/hooks/useTaskActions'
 
 interface EditTaskModalProps {
   isOpen: boolean
   onClose: () => void
-  project: Project
   task: Task
+  project: Project
 }
 
 export function EditTaskModal({
   isOpen,
   onClose,
-  project,
   task,
+  project,
 }: EditTaskModalProps) {
-  const { updateTask } = useProjects()
+  const { updateTask } = useTaskActions()
   const { teams } = useTeams()
   const { user } = useAuth()
   const [title, setTitle] = useState(task.title)
@@ -36,19 +36,19 @@ export function EditTaskModal({
   const [priority, setPriority] = useState<Task['priority']>(task.priority)
   const [label, setLabel] = useState('')
   const [labels, setLabels] = useState<string[]>(task.labels)
-  const [assignedTo, setAssignedTo] = useState(task.assignedTo || user?.uid || '')
-  const [dueDate, setDueDate] = useState(task.dueDate || '')
+  const [assignedTo, setAssignedTo] = useState(task.assignedTo)
+  const [dueDate, setDueDate] = useState(task.dueDate)
   const [loading, setLoading] = useState(false)
 
-  // Reset form when task changes
+  // Update form when task changes
   useEffect(() => {
     setTitle(task.title)
     setDescription(task.description)
     setPriority(task.priority)
     setLabels(task.labels)
-    setAssignedTo(task.assignedTo || user?.uid || '')
-    setDueDate(task.dueDate || '')
-  }, [task, user?.uid])
+    setAssignedTo(task.assignedTo)
+    setDueDate(task.dueDate)
+  }, [task])
 
   // Find the current project's team members
   const currentTeam = teams.find((team) => team.id === project.teamId)
@@ -57,16 +57,17 @@ export function EditTaskModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!user) return
     setLoading(true)
 
     try {
-      await updateTask(project.id, task.id, {
+      await updateTask(task.id, {
         title,
         description,
         priority,
         labels,
         assignedTo,
-        dueDate,
+        dueDate
       })
       onClose()
     } catch (error) {

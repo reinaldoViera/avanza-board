@@ -64,7 +64,7 @@ export default function DashboardPage() {
         <div className="card">
           <div className="text-sm font-medium text-gray-500">In Progress</div>
           <div className="mt-1 text-3xl font-semibold">
-            {tasks.filter(task => task.status === 'in-progress').length}
+            {tasks.filter(task => task.status === 'in_progress').length}
           </div>
         </div>
         <div className="card">
@@ -111,7 +111,7 @@ export default function DashboardPage() {
                     <span className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
                       task.status === 'done'
                         ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                        : task.status === 'in-progress'
+                        : task.status === 'in_progress'
                         ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
                         : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200'
                     }`}>

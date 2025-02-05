@@ -9,11 +9,11 @@ import {
   TransitionChild,
 } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
-import { useProjects } from '../hooks/useProjects'
 import { useTeams } from '@/features/teams/hooks/useTeams'
 import { Task } from '@/features/types'
 import { Project } from '../types'
 import { useAuth } from '@/features/auth/AuthProvider'
+import { useTaskActions } from '@/features/tasks/hooks/useTaskActions'
 
 interface CreateTaskModalProps {
   isOpen: boolean
@@ -26,7 +26,7 @@ export function CreateTaskModal({
   onClose,
   project,
 }: CreateTaskModalProps) {
-  const { addTask } = useProjects()
+  const { createTask } = useTaskActions()
   const { teams } = useTeams()
   const { user } = useAuth()
   const [title, setTitle] = useState('')
@@ -45,10 +45,11 @@ export function CreateTaskModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!user) return
     setLoading(true)
 
     try {
-      await addTask(project.id, {
+      await createTask(project.id, {
         title,
         description,
         status: 'todo',
@@ -56,6 +57,7 @@ export function CreateTaskModal({
         labels,
         assignedTo,
         dueDate,
+        createdBy: user.uid,
       })
       onClose()
       setTitle('')

@@ -1,7 +1,9 @@
-
-
+/**
+ * Task interface
+ */
 export interface Task {
   id: string
+  projectId: string
   title: string
   description: string
   status: 'todo' | 'in_progress' | 'done'
@@ -14,12 +16,18 @@ export interface Task {
   updatedAt: string
 }
 
+/**
+ * Column interface
+ */
 export interface Column {
   id: string
   title: string
   taskIds: string[]
 }
 
+/**
+ * Board interface
+ */
 export interface Board {
   tasks: { [key: string]: Task }
   columns: { [key: string]: Column }
