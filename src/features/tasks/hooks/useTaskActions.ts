@@ -1,7 +1,6 @@
-import { addDoc, collection, doc, updateDoc, arrayUnion, getDoc } from 'firebase/firestore'
+import { addDoc, collection, doc, updateDoc, arrayUnion, getDoc, deleteDoc, arrayRemove } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 import { Task } from '@/features/types'
-import { nanoid } from 'nanoid'
 
 interface CreateTaskData extends Omit<Task, 'id' | 'createdAt' | 'updatedAt' | 'createdBy' | 'projectId'> {
   createdBy: string
@@ -50,8 +49,30 @@ export function useTaskActions() {
     return taskId
   }
 
+  const deleteTask = async (taskId: string) => {
+    const taskRef = doc(db, 'tasks', taskId)
+    
+    // Get task data to find its project
+    const taskSnap = await getDoc(taskRef)
+    if (!taskSnap.exists()) {
+      throw new Error('Task not found')
+    }
+
+    const taskData = taskSnap.data() as Task
+    const projectRef = doc(db, 'projects', taskData.projectId)
+
+    // Remove task from project's taskIds
+    await updateDoc(projectRef, {
+      taskIds: arrayRemove(taskId)
+    })
+
+    // Delete the task document
+    await deleteDoc(taskRef)
+  }
+
   return {
     createTask,
-    updateTask
+    updateTask,
+    deleteTask
   }
 }
