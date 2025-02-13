@@ -1,31 +1,37 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth'
-import { auth } from '@/lib/firebase'
+import { useState } from "react";
+import {
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
+} from "firebase/auth";
+import { auth } from "@/lib/firebase";
 
 export function SignInForm() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   const handleEmailSignIn = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     try {
-      await signInWithEmailAndPassword(auth, email, password)
-    } catch (error) {
-      setError('Failed to sign in. Please check your credentials.')
+      await signInWithEmailAndPassword(auth, email, password);
+    } catch (e) {
+      setError("Failed to sign in. Please check your credentials.");
+      console.error(e);
     }
-  }
+  };
 
   const handleGoogleSignIn = async () => {
     try {
-      const provider = new GoogleAuthProvider()
-      await signInWithPopup(auth, provider)
-    } catch (error) {
-      setError('Failed to sign in with Google.')
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+    } catch (e) {
+      setError("Failed to sign in with Google.");
+      console.error(e);
     }
-  }
+  };
 
   return (
     <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
@@ -38,7 +44,10 @@ export function SignInForm() {
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
         <form className="space-y-6" onSubmit={handleEmailSignIn}>
           <div>
-            <label htmlFor="email" className="block text-sm font-medium leading-6">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium leading-6"
+            >
               Email address
             </label>
             <div className="mt-2">
@@ -56,7 +65,10 @@ export function SignInForm() {
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium leading-6">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium leading-6"
+            >
               Password
             </label>
             <div className="mt-2">
@@ -73,17 +85,10 @@ export function SignInForm() {
             </div>
           </div>
 
-          {error && (
-            <div className="text-sm text-red-500">
-              {error}
-            </div>
-          )}
+          {error && <div className="text-sm text-red-500">{error}</div>}
 
           <div>
-            <button
-              type="submit"
-              className="btn-primary w-full"
-            >
+            <button type="submit" className="btn-primary w-full">
               Sign in
             </button>
           </div>
@@ -130,5 +135,5 @@ export function SignInForm() {
         </div>
       </div>
     </div>
-  )
+  );
 }

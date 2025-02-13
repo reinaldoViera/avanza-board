@@ -1,25 +1,25 @@
-'use client'
+"use client";
 
-import { Fragment, useState, useEffect } from 'react'
+import { Fragment, useState, useEffect } from "react";
 import {
   Dialog,
   DialogPanel,
   DialogTitle,
   Transition,
   TransitionChild,
-} from '@headlessui/react'
-import { XMarkIcon, TrashIcon } from '@heroicons/react/24/outline'
-import { useTeams } from '@/features/teams/hooks/useTeams'
-import { Task } from '@/features/types'
-import { Project } from '../types'
-import { useAuth } from '@/features/auth/AuthProvider'
-import { useTaskActions } from '@/features/tasks/hooks/useTaskActions'
+} from "@headlessui/react";
+import { XMarkIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { useTeams } from "@/features/teams/hooks/useTeams";
+import { Task } from "@/features/types";
+import { Project } from "../types";
+import { useAuth } from "@/features/auth/AuthProvider";
+import { useTaskActions } from "@/features/tasks/hooks/useTaskActions";
 
 interface EditTaskModalProps {
-  isOpen: boolean
-  onClose: () => void
-  task: Task
-  project: Project
+  isOpen: boolean;
+  onClose: () => void;
+  task: Task;
+  project: Project;
 }
 
 export function EditTaskModal({
@@ -28,38 +28,38 @@ export function EditTaskModal({
   task,
   project,
 }: EditTaskModalProps) {
-  const { updateTask, deleteTask } = useTaskActions()
-  const { teams } = useTeams()
-  const { user } = useAuth()
-  const [title, setTitle] = useState(task.title)
-  const [description, setDescription] = useState(task.description)
-  const [priority, setPriority] = useState<Task['priority']>(task.priority)
-  const [label, setLabel] = useState('')
-  const [labels, setLabels] = useState<string[]>(task.labels)
-  const [assignedTo, setAssignedTo] = useState(task.assignedTo)
-  const [dueDate, setDueDate] = useState(task.dueDate)
-  const [loading, setLoading] = useState(false)
-  const [isDeleting, setIsDeleting] = useState(false)
+  const { updateTask, deleteTask } = useTaskActions();
+  const { teams } = useTeams();
+  const { user } = useAuth();
+  const [title, setTitle] = useState(task.title);
+  const [description, setDescription] = useState(task.description);
+  const [priority, setPriority] = useState<Task["priority"]>(task.priority);
+  const [label, setLabel] = useState("");
+  const [labels, setLabels] = useState<string[]>(task.labels);
+  const [assignedTo, setAssignedTo] = useState(task.assignedTo);
+  const [dueDate, setDueDate] = useState(task.dueDate);
+  const [loading, setLoading] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Update form when task changes
   useEffect(() => {
-    setTitle(task.title)
-    setDescription(task.description)
-    setPriority(task.priority)
-    setLabels(task.labels)
-    setAssignedTo(task.assignedTo)
-    setDueDate(task.dueDate)
-  }, [task])
+    setTitle(task.title);
+    setDescription(task.description);
+    setPriority(task.priority);
+    setLabels(task.labels);
+    setAssignedTo(task.assignedTo);
+    setDueDate(task.dueDate);
+  }, [task]);
 
   // Find the current project's team members
-  const currentTeam = teams.find((team) => team.id === project.teamId)
-  const teamMembersMap = currentTeam?.members || {}
-  const teamMembers = Object.values(teamMembersMap)
+  const currentTeam = teams.find((team) => team.id === project.teamId);
+  const teamMembersMap = currentTeam?.members || {};
+  const teamMembers = Object.values(teamMembersMap);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!user) return
-    setLoading(true)
+    e.preventDefault();
+    if (!user) return;
+    setLoading(true);
 
     try {
       await updateTask(task.id, {
@@ -68,40 +68,40 @@ export function EditTaskModal({
         priority,
         labels,
         assignedTo,
-        dueDate
-      })
-      onClose()
+        dueDate,
+      });
+      onClose();
     } catch (error) {
-      console.error('Error updating task:', error)
+      console.error("Error updating task:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleDelete = async () => {
-    if (!window.confirm('Are you sure you want to delete this task?')) return
-    setIsDeleting(true)
+    if (!window.confirm("Are you sure you want to delete this task?")) return;
+    setIsDeleting(true);
 
     try {
-      await deleteTask(task.id)
-      onClose()
+      await deleteTask(task.id);
+      onClose();
     } catch (error) {
-      console.error('Error deleting task:', error)
+      console.error("Error deleting task:", error);
     } finally {
-      setIsDeleting(false)
+      setIsDeleting(false);
     }
-  }
+  };
 
   const addLabel = () => {
     if (label && !labels.includes(label)) {
-      setLabels([...labels, label])
-      setLabel('')
+      setLabels([...labels, label]);
+      setLabel("");
     }
-  }
+  };
 
   const removeLabel = (labelToRemove: string) => {
-    setLabels(labels.filter((l) => l !== labelToRemove))
-  }
+    setLabels(labels.filter((l) => l !== labelToRemove));
+  };
 
   return (
     <Transition show={isOpen} as={Fragment}>
@@ -131,7 +131,10 @@ export function EditTaskModal({
             >
               <DialogPanel className="w-full max-w-2xl transform overflow-hidden rounded-xl bg-white dark:bg-gray-800 p-6 text-left align-middle shadow-xl transition-all">
                 <div className="flex items-center justify-between">
-                  <DialogTitle as="h3" className="text-lg font-medium leading-6 text-gray-900 dark:text-gray-100">
+                  <DialogTitle
+                    as="h3"
+                    className="text-lg font-medium leading-6 text-gray-900 dark:text-gray-100"
+                  >
                     Edit Task
                   </DialogTitle>
                   <div className="flex items-center gap-2">
@@ -200,7 +203,7 @@ export function EditTaskModal({
                         className="input-field mt-1"
                         value={priority}
                         onChange={(e) =>
-                          setPriority(e.target.value as Task['priority'])
+                          setPriority(e.target.value as Task["priority"])
                         }
                       >
                         <option value="low">Low</option>
@@ -224,9 +227,9 @@ export function EditTaskModal({
                           value={label}
                           onChange={(e) => setLabel(e.target.value)}
                           onKeyUp={(e) => {
-                            if (e.key === 'Enter') {
-                              e.preventDefault()
-                              addLabel()
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              addLabel();
                             }
                           }}
                         />
@@ -274,11 +277,8 @@ export function EditTaskModal({
                       >
                         <option value="">Unassigned</option>
                         {teamMembers.map((member) => (
-                          <option
-                            key={member.userId}
-                            value={member.userId}
-                          >
-                            {member.name || member.email}
+                          <option key={member.userId} value={member.userId}>
+                            {member.email}
                           </option>
                         ))}
                       </select>
@@ -313,7 +313,7 @@ export function EditTaskModal({
                         className="btn-primary"
                         disabled={loading}
                       >
-                        {loading ? 'Saving...' : 'Save Changes'}
+                        {loading ? "Saving..." : "Save Changes"}
                       </button>
                     </div>
                   </form>
@@ -324,5 +324,5 @@ export function EditTaskModal({
         </div>
       </Dialog>
     </Transition>
-  )
+  );
 }

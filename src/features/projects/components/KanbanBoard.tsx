@@ -1,73 +1,72 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
+import { useState } from "react";
 import {
   DragDropContext,
   Droppable,
   Draggable,
   DropResult,
-} from '@hello-pangea/dnd'
-import { Project, TaskStatus } from '../types'
-import { useProjects } from '../hooks/useProjects'
-import { useTasks } from '@/features/tasks/hooks/useTasks'
-import { useTaskActions } from '@/features/tasks/hooks/useTaskActions'
-import { PlusIcon, PencilIcon } from '@heroicons/react/24/outline'
-import { CreateTaskModal } from './CreateTaskModal'
-import { EditTaskModal } from './EditTaskModal'
-import { Task } from '@/features/types'
+} from "@hello-pangea/dnd";
+import { Project, TaskStatus } from "../types";
+import { useTasks } from "@/features/tasks/hooks/useTasks";
+import { useTaskActions } from "@/features/tasks/hooks/useTaskActions";
+import { PlusIcon, PencilIcon } from "@heroicons/react/24/outline";
+import { CreateTaskModal } from "./CreateTaskModal";
+import { EditTaskModal } from "./EditTaskModal";
+import { Task } from "@/features/types";
 
 interface KanbanBoardProps {
-  project: Project
+  project: Project;
 }
 
 const columns: { id: TaskStatus; title: string }[] = [
-  { id: 'todo', title: 'To Do' },
-  { id: 'in_progress', title: 'In Progress' },
-  { id: 'done', title: 'Done' },
-]
+  { id: "todo", title: "To Do" },
+  { id: "in_progress", title: "In Progress" },
+  { id: "done", title: "Done" },
+];
 
 export function KanbanBoard({ project }: KanbanBoardProps) {
-  const { updateTask } = useTaskActions()
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
-  const [selectedTask, setSelectedTask] = useState<Task | null>(null)
+  const { updateTask } = useTaskActions();
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
-  const { tasks: projectTasks, loading } = useTasks(project.id)
+  const { tasks: projectTasks } = useTasks(project.id);
 
   const tasks = projectTasks.reduce<Record<TaskStatus, Task[]>>(
     (acc, task) => {
       if (!acc[task.status]) {
-        acc[task.status] = []
+        acc[task.status] = [];
       }
-      acc[task.status].push(task)
-      return acc
+      acc[task.status].push(task);
+      return acc;
     },
     { todo: [], in_progress: [], done: [] }
-  )
+  );
 
   const onDragEnd = async (result: DropResult) => {
-    const { destination, source, draggableId } = result
+    const { destination, source, draggableId } = result;
 
-    if (!destination) return
+    if (!destination) return;
 
     if (
       destination.droppableId === source.droppableId &&
       destination.index === source.index
     ) {
-      return
+      return;
     }
 
-    const task = projectTasks.find((t) => t.id === draggableId)
-    if (!task) return
+    const task = projectTasks.find((t) => t.id === draggableId);
+    if (!task) return;
 
     try {
       await updateTask(task.id, {
         status: destination.droppableId as TaskStatus,
-      })
+      });
     } catch (error) {
-      console.error('Error updating task status:', error)
+      console.error("Error updating task status:", error);
     }
-  }
+  };
 
   return (
     <>
@@ -115,8 +114,8 @@ export function KanbanBoard({ project }: KanbanBoardProps) {
                               <h4 className="font-medium">{task.title}</h4>
                               <button
                                 onClick={() => {
-                                  setSelectedTask(task)
-                                  setIsEditModalOpen(true)
+                                  setSelectedTask(task);
+                                  setIsEditModalOpen(true);
                                 }}
                                 className="ml-2 rounded p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-500 dark:hover:bg-gray-700"
                               >
@@ -129,11 +128,11 @@ export function KanbanBoard({ project }: KanbanBoardProps) {
                             <div className="mt-2 flex flex-wrap items-center gap-2">
                               <span
                                 className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
-                                  task.priority === 'high'
-                                    ? 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-200'
-                                    : task.priority === 'medium'
-                                    ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-200'
-                                    : 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-200'
+                                  task.priority === "high"
+                                    ? "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-200"
+                                    : task.priority === "medium"
+                                      ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-200"
+                                      : "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-200"
                                 }`}
                               >
                                 {task.priority}
@@ -170,13 +169,13 @@ export function KanbanBoard({ project }: KanbanBoardProps) {
         <EditTaskModal
           isOpen={isEditModalOpen}
           onClose={() => {
-            setIsEditModalOpen(false)
-            setSelectedTask(null)
+            setIsEditModalOpen(false);
+            setSelectedTask(null);
           }}
           project={project}
           task={selectedTask}
         />
       )}
     </>
-  )
+  );
 }
