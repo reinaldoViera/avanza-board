@@ -77,22 +77,6 @@ export function useTeams() {
     });
   };
 
-  const generateInviteLink = async (teamId: string) => {
-    const inviteCode = nanoid(10);
-    const inviteRef = doc(collection(db, "teamInvites"));
-
-    await setDoc(inviteRef, {
-      teamId,
-      code: inviteCode,
-      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days
-      createdBy: user?.uid,
-      createdAt: new Date().toISOString(),
-      used: false,
-    });
-
-    return `${window.location.origin}/teams/join/${inviteCode}`;
-  };
-
   const joinTeamWithCode = async (inviteCode: string) => {
     if (!user) return false;
 
@@ -191,7 +175,6 @@ export function useTeams() {
     loading,
     createTeam,
     updateTeam,
-    generateInviteLink,
     joinTeamWithCode,
     updateMemberRole,
     removeMember,
