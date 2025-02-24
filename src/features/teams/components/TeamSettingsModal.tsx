@@ -15,7 +15,6 @@ import {
 } from "@headlessui/react";
 import { XMarkIcon, ClipboardIcon } from "@heroicons/react/24/outline";
 import { useAuth } from "@/features/auth/AuthProvider";
-import { add } from "date-fns";
 import { Team, TeamMember } from "../types";
 import { useTeams } from "../hooks/useTeams";
 import { useTeamInvites } from "../hooks/useTeamInvites";
@@ -60,7 +59,7 @@ export function TeamSettingsModal({
 
   const handleGenerateInviteLink = async () => {
     try {
-      const link = await generateInviteLink(team.id);
+      await generateInviteLink(team.id);
     } catch (error) {
       console.error("Error generating invite link:", error);
     }
