@@ -1,73 +1,95 @@
-'use client'
+"use client";
 
-import { Fragment, useState } from 'react'
-import { Dialog, Transition, Tab, TransitionChild, DialogPanel, DialogTitle, TabGroup, TabList, TabPanels, TabPanel } from '@headlessui/react'
-import { XMarkIcon, ClipboardIcon } from '@heroicons/react/24/outline'
-import { Team, TeamMember } from '../types'
-import { useTeams } from '../hooks/useTeams'
-import { useAuth } from '@/features/auth/AuthProvider'
+import { Fragment, useState } from "react";
+import {
+  Dialog,
+  Transition,
+  Tab,
+  TransitionChild,
+  DialogPanel,
+  DialogTitle,
+  TabGroup,
+  TabList,
+  TabPanels,
+  TabPanel,
+} from "@headlessui/react";
+import { XMarkIcon, ClipboardIcon } from "@heroicons/react/24/outline";
+import { useAuth } from "@/features/auth/AuthProvider";
+import { add } from "date-fns";
+import { Team, TeamMember } from "../types";
+import { useTeams } from "../hooks/useTeams";
+import { useTeamInvites } from "../hooks/useTeamInvites";
 
 interface TeamSettingsModalProps {
-  isOpen: boolean
-  onClose: () => void
-  team: Team
+  isOpen: boolean;
+  onClose: () => void;
+  team: Team;
 }
 
-export function TeamSettingsModal({ isOpen, onClose, team }: TeamSettingsModalProps) {
-  const { user } = useAuth()
-  const { updateTeam, generateInviteLink, updateMemberRole, removeMember } = useTeams()
-  const [name, setName] = useState(team.name)
-  const [description, setDescription] = useState(team.description)
-  const [inviteLink, setInviteLink] = useState('')
-  const [loading, setLoading] = useState(false)
-  const currentMember = user ? team.members[user.uid] : undefined
-  const isOwner = currentMember?.role === 'owner'
-  const membersList = Object.values(team.members)
+const linkForCode = (code: string) =>
+  `${window.location.origin}/teams/join/${code}`;
+
+export function TeamSettingsModal({
+  isOpen,
+  onClose,
+  team,
+}: TeamSettingsModalProps) {
+  const { user } = useAuth();
+  const { updateTeam, updateMemberRole, removeMember } = useTeams();
+  const { teamInvites, generateInviteLink } = useTeamInvites(team.id);
+  const [name, setName] = useState(team.name);
+  const [description, setDescription] = useState(team.description);
+  const [loading, setLoading] = useState(false);
+  const currentMember = user ? team.members[user.uid] : undefined;
+  const isOwner = currentMember?.role === "owner";
+  const membersList = Object.values(team.members);
 
   const handleUpdateTeam = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
+    e.preventDefault();
+    setLoading(true);
 
     try {
-      await updateTeam(team.id, { name, description })
-      onClose()
+      await updateTeam(team.id, { name, description });
+      onClose();
     } catch (error) {
-      console.error('Error updating team:', error)
+      console.error("Error updating team:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleGenerateInviteLink = async () => {
     try {
-      const link = await generateInviteLink(team.id)
-      setInviteLink(link)
+      const link = await generateInviteLink(team.id);
     } catch (error) {
-      console.error('Error generating invite link:', error)
+      console.error("Error generating invite link:", error);
     }
-  }
+  };
 
-  const copyInviteLink = () => {
-    navigator.clipboard.writeText(inviteLink)
-  }
+  const copyInviteLink = (code: string) => () => {
+    navigator.clipboard.writeText(linkForCode(code));
+  };
 
-  const handleUpdateRole = async (userId: string, newRole: TeamMember['role']) => {
+  const handleUpdateRole = async (
+    userId: string,
+    newRole: TeamMember["role"]
+  ) => {
     try {
-      await updateMemberRole(team.id, userId, newRole)
+      await updateMemberRole(team.id, userId, newRole);
     } catch (error) {
-      console.error('Error updating member role:', error)
+      console.error("Error updating member role:", error);
     }
-  }
+  };
 
   const handleRemoveMember = async (userId: string) => {
-    if (!confirm('Are you sure you want to remove this member?')) return
+    if (!confirm("Are you sure you want to remove this member?")) return;
 
     try {
-      await removeMember(team.id, userId)
+      await removeMember(team.id, userId);
     } catch (error) {
-      console.error('Error removing member:', error)
+      console.error("Error removing member:", error);
     }
-  }
+  };
 
   return (
     <Transition show={isOpen} as={Fragment}>
@@ -110,7 +132,10 @@ export function TeamSettingsModal({ isOpen, onClose, team }: TeamSettingsModalPr
                 <div className="bg-white px-4 pb-4 pt-5 dark:bg-gray-900 sm:p-6">
                   <div className="sm:flex sm:items-start">
                     <div className="mt-3 w-full text-center sm:mt-0 sm:text-left">
-                      <DialogTitle as="h3" className="text-lg font-semibold leading-6">
+                      <DialogTitle
+                        as="h3"
+                        className="text-lg font-semibold leading-6"
+                      >
                         Team Settings
                       </DialogTitle>
 
@@ -120,8 +145,8 @@ export function TeamSettingsModal({ isOpen, onClose, team }: TeamSettingsModalPr
                             className={({ selected }) =>
                               `border-b-2 px-4 py-2 text-sm font-medium ${
                                 selected
-                                  ? 'border-primary-500 text-primary-600'
-                                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                                  ? "border-primary-500 text-primary-600"
+                                  : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
                               }`
                             }
                           >
@@ -131,8 +156,8 @@ export function TeamSettingsModal({ isOpen, onClose, team }: TeamSettingsModalPr
                             className={({ selected }) =>
                               `border-b-2 px-4 py-2 text-sm font-medium ${
                                 selected
-                                  ? 'border-primary-500 text-primary-600'
-                                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                                  ? "border-primary-500 text-primary-600"
+                                  : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
                               }`
                             }
                           >
@@ -142,8 +167,8 @@ export function TeamSettingsModal({ isOpen, onClose, team }: TeamSettingsModalPr
                             className={({ selected }) =>
                               `border-b-2 px-4 py-2 text-sm font-medium ${
                                 selected
-                                  ? 'border-primary-500 text-primary-600'
-                                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                                  ? "border-primary-500 text-primary-600"
+                                  : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
                               }`
                             }
                           >
@@ -153,9 +178,15 @@ export function TeamSettingsModal({ isOpen, onClose, team }: TeamSettingsModalPr
 
                         <TabPanels className="mt-4">
                           <TabPanel>
-                            <form onSubmit={handleUpdateTeam} className="space-y-4">
+                            <form
+                              onSubmit={handleUpdateTeam}
+                              className="space-y-4"
+                            >
                               <div>
-                                <label htmlFor="name" className="block text-sm font-medium">
+                                <label
+                                  htmlFor="name"
+                                  className="block text-sm font-medium"
+                                >
                                   Team Name
                                 </label>
                                 <input
@@ -169,7 +200,10 @@ export function TeamSettingsModal({ isOpen, onClose, team }: TeamSettingsModalPr
                               </div>
 
                               <div>
-                                <label htmlFor="description" className="block text-sm font-medium">
+                                <label
+                                  htmlFor="description"
+                                  className="block text-sm font-medium"
+                                >
                                   Description
                                 </label>
                                 <textarea
@@ -177,13 +211,19 @@ export function TeamSettingsModal({ isOpen, onClose, team }: TeamSettingsModalPr
                                   rows={3}
                                   className="input-field mt-1"
                                   value={description}
-                                  onChange={(e) => setDescription(e.target.value)}
+                                  onChange={(e) =>
+                                    setDescription(e.target.value)
+                                  }
                                 />
                               </div>
 
                               <div className="flex justify-end">
-                                <button type="submit" disabled={loading} className="btn-primary">
-                                  {loading ? 'Saving...' : 'Save Changes'}
+                                <button
+                                  type="submit"
+                                  disabled={loading}
+                                  className="btn-primary"
+                                >
+                                  {loading ? "Saving..." : "Save Changes"}
                                 </button>
                               </div>
                             </form>
@@ -192,7 +232,10 @@ export function TeamSettingsModal({ isOpen, onClose, team }: TeamSettingsModalPr
                           <TabPanel>
                             <div className="space-y-4">
                               <div className="flow-root">
-                                <ul role="list" className="-my-5 divide-y divide-gray-200 dark:divide-gray-700">
+                                <ul
+                                  role="list"
+                                  className="-my-5 divide-y divide-gray-200 dark:divide-gray-700"
+                                >
                                   {membersList.map((member) => (
                                     <li key={member.userId} className="py-4">
                                       <div className="flex items-center justify-between">
@@ -203,32 +246,50 @@ export function TeamSettingsModal({ isOpen, onClose, team }: TeamSettingsModalPr
                                             alt=""
                                           />
                                           <div className="ml-3">
-                                            <p className="text-sm font-medium">{member.email}</p>
+                                            <p className="text-sm font-medium">
+                                              {member.email}
+                                            </p>
                                             <p className="text-sm text-gray-500 dark:text-gray-400">
-                                              Joined {new Date(member.joinedAt).toLocaleDateString()}
+                                              Joined{" "}
+                                              {new Date(
+                                                member.joinedAt
+                                              ).toLocaleDateString()}
                                             </p>
                                           </div>
                                         </div>
-                                        {isOwner && member.userId !== user?.uid && (
-                                          <div className="flex items-center gap-2">
-                                            <select
-                                              value={member.role}
-                                              onChange={(e) =>
-                                                handleUpdateRole(member.userId, e.target.value as TeamMember['role'])
-                                              }
-                                              className="input-field text-sm"
-                                            >
-                                              <option value="member">Member</option>
-                                              <option value="admin">Admin</option>
-                                            </select>
-                                            <button
-                                              onClick={() => handleRemoveMember(member.userId)}
-                                              className="text-sm font-medium text-red-600 hover:text-red-500"
-                                            >
-                                              Remove
-                                            </button>
-                                          </div>
-                                        )}
+                                        {isOwner &&
+                                          member.userId !== user?.uid && (
+                                            <div className="flex items-center gap-2">
+                                              <select
+                                                value={member.role}
+                                                onChange={(e) =>
+                                                  handleUpdateRole(
+                                                    member.userId,
+                                                    e.target
+                                                      .value as TeamMember["role"]
+                                                  )
+                                                }
+                                                className="input-field text-sm"
+                                              >
+                                                <option value="member">
+                                                  Member
+                                                </option>
+                                                <option value="admin">
+                                                  Admin
+                                                </option>
+                                              </select>
+                                              <button
+                                                onClick={() =>
+                                                  handleRemoveMember(
+                                                    member.userId
+                                                  )
+                                                }
+                                                className="text-sm font-medium text-red-600 hover:text-red-500"
+                                              >
+                                                Remove
+                                              </button>
+                                            </div>
+                                          )}
                                         {!isOwner && (
                                           <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium capitalize text-gray-800 dark:bg-gray-800 dark:text-gray-200">
                                             {member.role}
@@ -254,8 +315,8 @@ export function TeamSettingsModal({ isOpen, onClose, team }: TeamSettingsModalPr
                                 </button>
                               </div>
 
-                              {inviteLink && (
-                                <div className="mt-4">
+                              {teamInvites.map(({ code, expiresAt }) => (
+                                <div className="mt-4" key={code}>
                                   <label className="block text-sm font-medium">
                                     Invite Link
                                   </label>
@@ -264,23 +325,27 @@ export function TeamSettingsModal({ isOpen, onClose, team }: TeamSettingsModalPr
                                       <input
                                         type="text"
                                         className="input-field"
-                                        value={inviteLink}
+                                        value={linkForCode(code)}
                                         readOnly
                                       />
                                     </div>
                                     <button
                                       type="button"
-                                      onClick={copyInviteLink}
+                                      onClick={copyInviteLink(code)}
                                       className="btn-secondary ml-3"
                                     >
-                                      <ClipboardIcon className="h-5 w-5" aria-hidden="true" />
+                                      <ClipboardIcon
+                                        className="h-5 w-5"
+                                        aria-hidden="true"
+                                      />
                                     </button>
                                   </div>
                                   <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                                    This link will expire in 7 days
+                                    This link will expire at{" "}
+                                    {new Date(expiresAt).toLocaleDateString()}
                                   </p>
                                 </div>
-                              )}
+                              ))}
                             </div>
                           </TabPanel>
                         </TabPanels>
@@ -294,5 +359,5 @@ export function TeamSettingsModal({ isOpen, onClose, team }: TeamSettingsModalPr
         </div>
       </Dialog>
     </Transition>
-  )
+  );
 }
