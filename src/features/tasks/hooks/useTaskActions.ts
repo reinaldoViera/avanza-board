@@ -7,6 +7,9 @@ import {
   getDoc,
   deleteDoc,
   arrayRemove,
+  query,
+  where,
+  getDocs,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { Task } from "@/features/types";
@@ -87,9 +90,22 @@ export function useTaskActions() {
     await deleteDoc(taskRef);
   };
 
+  const deleteProjectTasks = async (projectId: string) => {
+    const q = query(
+      collection(db, "tasks"),
+      where("projectId", "==", projectId)
+    );
+    const snapshot = await getDocs(q);
+    const tasks = snapshot.docs.map((doc) => doc.id);
+    for (const taskId of tasks) {
+      await deleteTask(taskId);
+    }
+  };
+
   return {
     createTask,
     updateTask,
     deleteTask,
+    deleteProjectTasks,
   };
 }
