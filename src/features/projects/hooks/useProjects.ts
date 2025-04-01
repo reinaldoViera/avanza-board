@@ -15,12 +15,14 @@ import {
 import { db } from "@/lib/firebase";
 import { Project } from "../types";
 import { useTeams } from "@/features/teams/hooks/useTeams";
+import { useTaskActions } from "@/features/tasks/hooks/useTaskActions";
 
 export function useProjects(teamId?: string) {
   const { user } = useAuth();
   const { teams: myTeams } = useTeams();
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
+  const { deleteProjectTasks } = useTaskActions();
 
   useEffect(() => {
     if (!user) return;
@@ -80,9 +82,13 @@ export function useProjects(teamId?: string) {
     []
   );
 
-  const deleteProject = useCallback(async (projectId: string) => {
-    await deleteDoc(doc(db, "projects", projectId));
-  }, []);
+  const deleteProject = useCallback(
+    async (projectId: string) => {
+      await deleteProjectTasks(projectId);
+      await deleteDoc(doc(db, "projects", projectId));
+    },
+    [deleteProjectTasks]
+  );
 
   return {
     projects,
