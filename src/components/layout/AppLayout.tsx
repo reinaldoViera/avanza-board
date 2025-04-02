@@ -22,6 +22,7 @@ import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { ThemeToggle } from './ThemeToggle'
 import { UserNav } from './UserNav'
+import Image from 'next/image'
 
 interface NavigationItem {
   name: string
@@ -102,10 +103,12 @@ export default function AppLayout({
                 </TransitionChild>
                 <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-white px-6 pb-4 dark:bg-gray-900">
                   <div className="flex h-16 shrink-0 items-center">
-                    <img
+                    <Image
                       className="h-8 w-auto"
                       src="/logo.svg"
                       alt="AvanzaBoard"
+                      width={96}
+                      height={32}
                     />
                   </div>
                   <nav className="flex flex-1 flex-col">
@@ -122,11 +125,14 @@ export default function AppLayout({
                                     : 'text-gray-700 hover:bg-gray-50 hover:text-primary-600 dark:text-gray-300 dark:hover:bg-gray-800',
                                   'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6'
                                 )}
+                                onClick={() => {
+                                  setSidebarOpen(false);
+                                }}
                               >
                                 <item.icon
                                   className={cn(
                                     pathname === item.href
-                                      ? 'text-primary-600'
+                                      ? 'text-primary-600 dark:text-primary-400'
                                       : 'text-gray-400 group-hover:text-primary-600',
                                     'h-6 w-6 shrink-0'
                                   )}
@@ -153,6 +159,9 @@ export default function AppLayout({
                                     : 'text-gray-700 hover:bg-gray-50 hover:text-primary-600 dark:text-gray-300 dark:hover:bg-gray-800',
                                   'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6'
                                 )}
+                                onClick={() => {
+                                  setSidebarOpen(false);
+                                }}
                               >
                                 <FolderIcon
                                   className={cn(
@@ -182,7 +191,7 @@ export default function AppLayout({
       <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
         <div className="flex grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6 pb-4 dark:border-gray-800 dark:bg-gray-900">
           <div className="flex h-16 shrink-0 items-center">
-            <img className="h-8 w-auto" src="/logo.svg" alt="AvanzaBoard" />
+            <Image className="h-8 w-auto" src="/logo.svg" alt="AvanzaBoard" width={96} height={32} />
           </div>
           <nav className="flex flex-1 flex-col">
             <ul role="list" className="flex flex-1 flex-col gap-y-7">

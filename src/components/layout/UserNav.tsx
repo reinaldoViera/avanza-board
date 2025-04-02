@@ -5,6 +5,7 @@ import { Menu, MenuButton, MenuItem, MenuItems, Transition } from '@headlessui/r
 import { signOut } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
 import { useAuth } from '@/features/auth/AuthProvider'
+import Image from 'next/image';
 
 export function UserNav() {
   const { user } = useAuth()
@@ -17,10 +18,12 @@ export function UserNav() {
     <Menu as="div" className="relative">
       <MenuButton className="-m-1.5 flex items-center p-1.5">
         <span className="sr-only">Open user menu</span>
-        <img
+        <Image
           className="h-8 w-8 rounded-full bg-gray-50"
-          src={user?.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${user?.email}`}
+          src={user?.photoURL || `https://api.dicebear.com/9.x/initials/png?seed=${user?.email}`}
           alt=""
+          width={32}
+          height={32}
         />
       </MenuButton>
       <Transition
