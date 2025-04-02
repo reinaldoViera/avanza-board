@@ -267,7 +267,6 @@ export function CreateTaskModal({
                           className="input-field mt-1"
                           value={assignedTo}
                           onChange={(e) => setAssignedTo(e.target.value)}
-                          required
                         >
                           <option value="">Unassigned</option>
                           {teamMembers.map((member) => (
