@@ -1,16 +1,46 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { collection, query, where, getDocs } from 'firebase/firestore'
+import { collection, query, where, getDocs, orderBy } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 import { useAuth } from '@/features/auth/AuthProvider'
 import { Task } from '@/features/types'
+import { useSearchParams } from 'next/navigation'
+import Link from 'next/link'
+
+
 
 
 export default function DashboardPage() {
   const { user } = useAuth()
   const [tasks, setTasks] = useState<Task[]>([])
   const [loading, setLoading] = useState(true)
+  const searchParams = useSearchParams()
+  const status = searchParams.get('status');
+  const priority = searchParams.get('priority');
+  
+  const displayTasks = tasks.filter(task => {
+    if (status) {
+      return task.status === status
+    }
+    if (priority) {
+      return task.priority === priority
+    }
+    return true
+  })
+
+  const totals = tasks.reduce((acc, task) => {
+    if (task.status === 'in_progress') {
+      acc.inProgress += 1
+    } else if (task.status === 'done') {
+      acc.done += 1
+    }
+    if (task.priority === 'high') {
+      acc.highPriority += 1
+    }
+    return acc
+  }, { inProgress: 0, done: 0, highPriority: 0 })
+
 
   useEffect(() => {
     const fetchTasks = async () => {
@@ -19,7 +49,8 @@ export default function DashboardPage() {
       try {
         const q = query(
           collection(db, 'tasks'),
-          where('assignedTo', '==', user.uid)
+          where('assignedTo', '==', user.uid),
+          orderBy('dueDate', 'desc')
         )
         const querySnapshot = await getDocs(q)
         const tasksData = querySnapshot.docs.map(doc => ({
@@ -37,6 +68,8 @@ export default function DashboardPage() {
 
     fetchTasks()
   }, [user])
+
+    
 
   if (loading) {
     return (
@@ -57,28 +90,29 @@ export default function DashboardPage() {
       </div>
 
       <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="card">
+
+        <Link className="card cursor-pointer" href="/dashboard">
           <div className="text-sm font-medium text-gray-500">Total Tasks</div>
           <div className="mt-1 text-3xl font-semibold">{tasks.length}</div>
-        </div>
-        <div className="card">
+        </Link>
+        <Link className="card cursor-pointer" href="/dashboard?status=in_progress">
           <div className="text-sm font-medium text-gray-500">In Progress</div>
           <div className="mt-1 text-3xl font-semibold">
-            {tasks.filter(task => task.status === 'in_progress').length}
+            {totals.inProgress}
           </div>
-        </div>
-        <div className="card">
+        </Link>
+        <Link className="card cursor-pointer" href="/dashboard?status=done">
           <div className="text-sm font-medium text-gray-500">Completed</div>
           <div className="mt-1 text-3xl font-semibold">
-            {tasks.filter(task => task.status === 'done').length}
+            {totals.done}
           </div>
-        </div>
-        <div className="card">
+        </Link>
+        <Link className="card cursor-pointer" href="/dashboard?priority=high">
           <div className="text-sm font-medium text-gray-500">High Priority</div>
           <div className="mt-1 text-3xl font-semibold">
-            {tasks.filter(task => task.priority === 'high').length}
+            {totals.highPriority}
           </div>
-        </div>
+        </Link>
       </div>
 
       <div className="mt-8">
@@ -102,7 +136,7 @@ export default function DashboardPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-900">
-              {tasks.slice(0, 5).map((task) => (
+              {displayTasks.slice(0, 5).map((task) => (
                 <tr key={task.id}>
                   <td className="whitespace-nowrap px-6 py-4">
                     <div className="text-sm">{task.title}</div>
@@ -130,7 +164,7 @@ export default function DashboardPage() {
                     </span>
                   </td>
                   <td className="whitespace-nowrap px-6 py-4 text-sm">
-                    {new Date(task.dueDate).toLocaleDateString()}
+                    {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : '-'}
                   </td>
                 </tr>
               ))}
