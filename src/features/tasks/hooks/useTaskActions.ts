@@ -14,19 +14,14 @@ import {
 import { db } from "@/lib/firebase";
 import { Task } from "@/features/types";
 
-interface CreateTaskData
-  extends Omit<
-    Task,
-    "id" | "createdAt" | "updatedAt" | "createdBy" | "projectId"
-  > {
-  createdBy: string;
-}
+type CreateTaskData = Omit<
+  Task,
+  "id" | "createdAt" | "updatedAt" | "projectId"
+>;
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-interface UpdateTaskData
-  extends Partial<
-    Omit<Task, "id" | "createdAt" | "updatedAt" | "createdBy" | "projectId">
-  > {}
+type UpdateTaskData = Partial<
+  Omit<Task, "id" | "createdAt" | "updatedAt" | "createdBy" | "projectId">
+>;
 
 export function useTaskActions() {
   const createTask = async (projectId: string, taskData: CreateTaskData) => {

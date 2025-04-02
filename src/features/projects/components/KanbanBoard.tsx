@@ -14,6 +14,8 @@ import { PlusIcon, PencilIcon } from "@heroicons/react/24/outline";
 import { CreateTaskModal } from "./CreateTaskModal";
 import { EditTaskModal } from "./EditTaskModal";
 import { Task } from "@/features/types";
+import { useTeamMembers } from "@/features/teams/hooks/useTeams";
+import Image from "next/image";
 
 interface KanbanBoardProps {
   project: Project;
@@ -30,7 +32,7 @@ export function KanbanBoard({ project }: KanbanBoardProps) {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-
+  const teamMembers = useTeamMembers(project.teamId);
   const { tasks: projectTasks } = useTasks(project.id);
 
   const tasks = projectTasks.reduce<Record<TaskStatus, Task[]>>(
@@ -145,6 +147,20 @@ export function KanbanBoard({ project }: KanbanBoardProps) {
                                   {label}
                                 </span>
                               ))}
+                            </div>
+                            <div className="mt-2 flex items-center justify-end">
+                            {task.assignedTo && teamMembers[task.assignedTo] && (
+                                <div className="relative inline-flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-sm font-medium text-gray-900 ring-2 ring-white dark:bg-gray-700 dark:ring-gray-800">
+                                <Image
+                                  width={32}
+                                  height={32}
+                                  src={`https://api.dicebear.com/9.x/initials/png?seed=${teamMembers[task.assignedTo].email}`}
+                                  alt={teamMembers[task.assignedTo].email}
+                                  className="h-full w-full rounded-full"
+                                />
+                                <span className="sr-only">{teamMembers[task.assignedTo].email}</span>
+                              </div>
+                              )}
                             </div>
                           </div>
                         )}

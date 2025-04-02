@@ -180,3 +180,9 @@ export function useTeams() {
     removeMember,
   };
 }
+
+export function useTeamMembers(teamId: string) {
+  const { teams } = useTeams();
+  const team = teams.find((t) => t.id === teamId);
+  return team?.members || {};
+}
